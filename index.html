@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +53,6 @@
 
     <!-- Notification / Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
-
     <!-- ========================================================================= -->
     <!-- 1. DOCTOR PORTAL SECTION                                                 -->
     <!-- ========================================================================= -->
@@ -131,7 +129,6 @@
           <span>Records Database</span>
         </button>
       </div>
-
       <!-- DOCTOR TAB CONTENT 1: ADD / UPLOAD EPISODE -->
       <div id="doc-panel-add-episode" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -201,7 +198,6 @@
               <textarea id="form-diagnosis" required rows="3" placeholder="Final verified clinical diagnosis and severity stage..." class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
             </div>
           </div>
-
           <!-- Medications & Precautions -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -320,4 +316,759 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-semibold">
-                <th class="p-3 rounded-l-
+                <th class="p-3 rounded-l-lg">Date / ID</th>
+                <th class="p-3">Patient</th>
+                <th class="p-3">Episode Title</th>
+                <th class="p-3">Confirmed Diagnosis</th>
+                <th class="p-3">Attending Doctor</th>
+                <th class="p-3 rounded-r-lg text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="db-table-body" class="text-sm divide-y divide-slate-100">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+    <!-- ========================================================================= -->
+    <!-- 2. PATIENT PORTAL SECTION                                                -->
+    <!-- ========================================================================= -->
+    <section id="patient-portal-section" class="hidden space-y-6">
+
+      <!-- Patient Portal Header Bar -->
+      <div class="bg-gradient-to-r from-emerald-700 to-teal-900 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="bg-emerald-500/30 text-emerald-200 text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full border border-emerald-400/30">Patient Personal Access</span>
+          <h2 class="text-2xl font-extrabold mt-2">My Health Records & Care Center</h2>
+          <p class="text-emerald-100 text-sm mt-1 max-w-2xl">View your official medical reports, prescribed dosages, physician contact info, emergency precautions, and check current symptoms.</p>
+        </div>
+
+        <!-- Patient ID Quick Lookup -->
+        <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 text-xs space-y-1 w-full md:w-auto">
+          <label class="block text-emerald-200 font-medium">Switch Patient Record ID:</label>
+          <div class="flex space-x-2">
+            <input type="text" id="patient-lookup-id" value="PT-1004" class="px-3 py-1.5 rounded bg-white text-slate-900 text-xs font-bold w-32 focus:outline-none" />
+            <button onclick="loadPatientPortal()" class="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-3 py-1.5 rounded transition text-xs flex items-center space-x-1">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Lookup</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Contact Card & Patient Profile Summary -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Patient Info Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-start space-x-4">
+          <div class="bg-emerald-100 text-emerald-700 p-3 rounded-2xl flex-shrink-0">
+            <i class="fa-solid fa-user-circle text-3xl"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Patient Profile</span>
+            <h3 id="patient-card-name" class="text-lg font-bold text-slate-800">Rahul Sharma</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Patient ID: <span id="patient-card-id" class="font-bold text-slate-700">PT-1004</span></p>
+            <div id="patient-card-records-count" class="inline-block mt-2 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md font-medium">
+              3 Episodes On File
+            </div>
+          </div>
+        </div>
+
+        <!-- Attending Doctor Contact Card -->
+        <div class="md:col-span-2 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="bg-sky-100 text-sky-700 p-3.5 rounded-2xl flex-shrink-0">
+              <i class="fa-solid fa-user-doctor text-3xl"></i>
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-sky-600 uppercase tracking-wider">Primary Attending Doctor</span>
+              <h3 id="patient-doc-name" class="text-lg font-bold text-slate-800">Dr. Ananya Sen, MD</h3>
+              <p id="patient-doc-spec" class="text-xs text-slate-500 font-medium">Senior Pulmonologist & Asthma Specialist</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            <a id="patient-doc-call" href="tel:+919876543210" class="flex-1 sm:flex-none bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition">
+              <i class="fa-solid fa-phone"></i>
+              <span>Call Doctor</span>
+            </a>
+            <a id="patient-doc-email" href="mailto:dr.ananya@medimemory.org" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition shadow-sm">
+              <i class="fa-solid fa-envelope"></i>
+              <span>Email Doctor</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Main Patient Details Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column: Reports & Prescriptions (2 Cols wide) -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                <i class="fa-solid fa-notes-medical text-emerald-600"></i>
+                <span>Medical Reports & Diagnosis History</span>
+              </h3>
+              <span class="text-xs text-slate-400 font-medium">Chronological</span>
+            </div>
+
+            <div id="patient-reports-list" class="space-y-4">
+              <!-- Dynamically Populated Cards -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Emergency Precautions & Interactive Checker -->
+        <div class="space-y-6">
+
+          <!-- Approved First-Aid & Precautions Card -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200 shadow-sm space-y-4">
+            <div class="flex items-center space-x-2 text-amber-800">
+              <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+              <h3 class="text-base font-bold">First Aid & Warning Precautions</h3>
+            </div>
+            <p class="text-xs text-amber-900/80">Approved instructions from your attending physician for acute episodes:</p>
+            
+            <div id="patient-precautions-list" class="space-y-3">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+          <!-- Personal Recurrence Symptom Checker -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center space-x-2 text-slate-800">
+              <i class="fa-solid fa-stethoscope text-sky-600"></i>
+              <h3 class="text-base font-bold">Self Recurrence Checker</h3>
+            </div>
+            <p class="text-xs text-slate-500">Experiencing symptoms right now? Enter them below to check if they match your documented medical history.</p>
+
+            <div class="space-y-3">
+              <textarea id="patient-symptom-check-input" rows="3" placeholder="e.g. Wheezing, Dry Cough, Shortness of breath" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"></textarea>
+              <button onclick="runPatientSelfCheck()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs shadow-sm flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Check History Overlap</span>
+              </button>
+            </div>
+
+            <div id="patient-check-results" class="hidden rounded-xl p-4 text-xs space-y-2">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      <p>MediMemory Recurrence Support System & Patient Portal &copy; 2026. Built with HTML5, Tailwind CSS & JavaScript LocalStorage.</p>
+    </div>
+  </footer>
+
+  <!-- APPLICATION LOGIC JS -->
+  <script>
+    // INITIAL SEED DATA
+    const INITIAL_RECORDS = [
+      {
+        id: "REC-101",
+        patientId: "PT-1004",
+        patientName: "Rahul Sharma",
+        date: "2026-03-15",
+        docName: "Dr. Ananya Sen, MD",
+        docSpecialty: "Senior Pulmonologist",
+        docContact: "+91 98765-43210 | dr.ananya@medimemory.org",
+        title: "Acute Bronchial Asthma Flare-up",
+        symptoms: ["Shortness of breath", "Wheezing", "Dry Cough", "Chest tightness"],
+        preDiagnosis: "Bilateral wheezing audible on auscultation. SPO2 at 94%. Mild respiratory distress.",
+        diagnosis: "Moderate Acute Bronchial Asthma Exacerbation triggered by dust exposure.",
+        prescription: "1. Salbutamol Inhaler (2 puffs every 4-6 hrs as needed)\n2. Budesonide 200mcg Inhaler (1 puff twice daily)\n3. Prednisolone 20mg for 5 days.",
+        precautions: "Avoid dusty environments. Keep quick-relief inhaler accessible at all times. Sit upright during acute wheezing. Seek immediate emergency care if oxygen falls below 92%."
+      },
+      {
+        id: "REC-102",
+        patientId: "PT-1004",
+        patientName: "Rahul Sharma",
+        date: "2025-11-10",
+        docName: "Dr. Ananya Sen, MD",
+        docSpecialty: "Senior Pulmonologist",
+        docContact: "+91 98765-43210 | dr.ananya@medimemory.org",
+        title: "Seasonal Bronchitis Episode",
+        symptoms: ["Wheezing", "Productive Cough", "Low Fever", "Fatigue"],
+        preDiagnosis: "Low grade fever (100.2 F), clear bronchial congestion on chest exam.",
+        diagnosis: "Viral Acute Bronchitis with secondary airway hyper-responsiveness.",
+        prescription: "1. Azithromycin 500mg daily for 3 days\n2. Cough Expectorant Syrup 10ml thrice daily\n3. Paracetamol 650mg as needed.",
+        precautions: "Drink warm fluids. Steam inhalation twice daily. Rest completely for 3 days."
+      },
+      {
+        id: "REC-103",
+        patientId: "PT-2009",
+        patientName: "Priya Nair",
+        date: "2026-02-04",
+        docName: "Dr. Rajesh Verma, MD",
+        docSpecialty: "Gastroenterologist",
+        docContact: "+91 91234-56789 | dr.rajesh@medimemory.org",
+        title: "Gastroesophageal Reflux Flare-up",
+        symptoms: ["Heartburn", "Acid Regurgitation", "Nausea", "Chest discomfort"],
+        preDiagnosis: "Epigastric tenderness present. Symptoms worsen post meals.",
+        diagnosis: "GERD (Gastroesophageal Reflux Disease) - Moderate Grade.",
+        prescription: "1. Esomeprazole 40mg before breakfast\n2. Antacid Gel 15ml post meals.",
+        precautions: "Avoid spicy/fatty foods. Do not lie down within 2 hours of eating. Elevate head end of bed."
+      }
+    ];
+
+    // STORAGE HANDLER
+    function getRecords() {
+      const data = localStorage.getItem("medimemory_records");
+      if (!data) {
+        localStorage.setItem("medimemory_records", JSON.stringify(INITIAL_RECORDS));
+        return INITIAL_RECORDS;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveRecords(records) {
+      localStorage.setItem("medimemory_records", JSON.stringify(records));
+      updateStats();
+    }
+
+    // TOAST NOTIFIER
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center space-x-2 text-white transition-all transform translate-y-2 ${type === "success" ? "bg-emerald-600" : type === "error" ? "bg-rose-600" : "bg-sky-600"}`;
+      toast.innerHTML = `<i class="fa-solid ${type === "success" ? "fa-circle-check" : "fa-circle-exclamation"}"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-4");
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // 1. NAVIGATION & PORTAL SWITCHING
+    function switchPortal(portal) {
+      const docPortal = document.getElementById("doctor-portal-section");
+      const patPortal = document.getElementById("patient-portal-section");
+      const docBtn = document.getElementById("nav-doctor-btn");
+      const patBtn = document.getElementById("nav-patient-btn");
+
+      if (portal === "doctor") {
+        docPortal.classList.remove("hidden");
+        patPortal.classList.add("hidden");
+        docBtn.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-active";
+        patBtn.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-inactive";
+        renderDoctorPortal();
+      } else {
+        docPortal.classList.add("hidden");
+        patPortal.classList.remove("hidden");
+        patBtn.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-active";
+        docBtn.className = "px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-inactive";
+        loadPatientPortal();
+      }
+    }
+
+    // 2. DOCTOR SUB-TABS SWITCHING
+    function switchDocTab(tabName) {
+      const tabs = ["add-episode", "timeline", "recurrence", "precautions", "database"];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`doc-tab-${t}`);
+        const panel = document.getElementById(`doc-panel-${t}`);
+        if (t === tabName) {
+          btn.className = "tab-active py-3 px-2 flex items-center space-x-2";
+          panel.classList.remove("hidden");
+        } else {
+          btn.className = "text-slate-500 hover:text-slate-800 py-3 px-2 flex items-center space-x-2";
+          panel.classList.add("hidden");
+        }
+      });
+
+      if (tabName === "timeline") renderDocTimeline();
+      if (tabName === "recurrence") populateRecurrenceDropdown();
+      if (tabName === "precautions") renderDocPrecautions();
+      if (tabName === "database") renderDatabaseTable();
+    }
+
+    // UPDATE STATS
+    function updateStats() {
+      const records = getRecords();
+      document.getElementById("stat-total-episodes").innerText = records.length;
+      
+      const uniquePatients = new Set(records.map(r => r.patientId)).size;
+      document.getElementById("stat-total-patients").innerText = uniquePatients;
+
+      const precautionsCount = records.filter(r => r.precautions && r.precautions.trim() !== "").length;
+      document.getElementById("stat-precautions-count").innerText = precautionsCount;
+    }
+
+    // FORM HANDLING (ADD / EDIT)
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const records = getRecords();
+      const editId = document.getElementById("edit-record-id").value;
+
+      const symptomsArr = document.getElementById("form-symptoms").value
+        .split(",")
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      const recordData = {
+        id: editId || `REC-${Math.floor(100 + Math.random() * 900)}`,
+        patientId: document.getElementById("form-patient-id").value.trim(),
+        patientName: document.getElementById("form-patient-name").value.trim(),
+        date: document.getElementById("form-date").value,
+        docName: document.getElementById("form-doc-name").value.trim(),
+        docSpecialty: document.getElementById("form-doc-specialty").value.trim() || "Attending Physician",
+        docContact: document.getElementById("form-doc-contact").value.trim() || "Contact Clinic Direct",
+        title: document.getElementById("form-title").value.trim(),
+        symptoms: symptomsArr,
+        preDiagnosis: document.getElementById("form-pre-diag").value.trim(),
+        diagnosis: document.getElementById("form-diagnosis").value.trim(),
+        prescription: document.getElementById("form-prescription").value.trim(),
+        precautions: document.getElementById("form-precautions").value.trim()
+      };
+
+      if (editId) {
+        const index = records.findIndex(r => r.id === editId);
+        if (index !== -1) records[index] = recordData;
+        showToast("Clinical record updated successfully!");
+      } else {
+        records.unshift(recordData);
+        showToast("New clinical episode logged successfully!");
+      }
+
+      saveRecords(records);
+      resetEpisodeForm();
+      switchDocTab("database");
+    }
+
+    function resetEpisodeForm() {
+      document.getElementById("episode-form").reset();
+      document.getElementById("edit-record-id").value = "";
+      document.getElementById("form-heading").innerText = "Log New Clinical Episode";
+      document.getElementById("btn-submit-form").innerHTML = `<i class="fa-solid fa-floppy-disk"></i><span>Save Clinical Record</span>`;
+      document.getElementById("btn-cancel-edit").classList.add("hidden");
+    }
+
+    function editRecord(id) {
+      const records = getRecords();
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+
+      switchDocTab("add-episode");
+      document.getElementById("edit-record-id").value = rec.id;
+      document.getElementById("form-patient-id").value = rec.patientId;
+      document.getElementById("form-patient-name").value = rec.patientName;
+      document.getElementById("form-date").value = rec.date;
+      document.getElementById("form-doc-name").value = rec.docName;
+      document.getElementById("form-doc-specialty").value = rec.docSpecialty || "";
+      document.getElementById("form-doc-contact").value = rec.docContact || "";
+      document.getElementById("form-title").value = rec.title;
+      document.getElementById("form-symptoms").value = rec.symptoms.join(", ");
+      document.getElementById("form-pre-diag").value = rec.preDiagnosis || "";
+      document.getElementById("form-diagnosis").value = rec.diagnosis;
+      document.getElementById("form-prescription").value = rec.prescription;
+      document.getElementById("form-precautions").value = rec.precautions;
+
+      document.getElementById("form-heading").innerText = `Editing Episode Record (${rec.id})`;
+      document.getElementById("btn-submit-form").innerHTML = `<i class="fa-solid fa-check-double"></i><span>Update Record</span>`;
+      document.getElementById("btn-cancel-edit").classList.remove("hidden");
+    }
+
+    function deleteRecord(id) {
+      if (!confirm("Are you sure you want to delete this medical record?")) return;
+      let records = getRecords();
+      records = records.filter(r => r.id !== id);
+      saveRecords(records);
+      showToast("Record deleted successfully.", "error");
+      renderDatabaseTable();
+    }
+    // RENDER TIMELINE (DOCTOR PORTAL)
+    function renderDocTimeline() {
+      const records = getRecords();
+      const filterSelect = document.getElementById("doc-timeline-patient-filter");
+      
+      // Populate Filter Select Options
+      const patientMap = {};
+      records.forEach(r => { patientMap[r.patientId] = r.patientName; });
+
+      const currentFilter = filterSelect.value || "ALL";
+      filterSelect.innerHTML = `<option value="ALL">All Patients (${records.length})</option>`;
+      Object.keys(patientMap).forEach(pid => {
+        filterSelect.innerHTML += `<option value="${pid}" ${currentFilter === pid ? 'selected' : ''}>${patientMap[pid]} (${pid})</option>`;
+      });
+
+      let filtered = records;
+      if (filterSelect.value && filterSelect.value !== "ALL") {
+        filtered = records.filter(r => r.patientId === filterSelect.value);
+      }
+
+      const container = document.getElementById("doc-timeline-container");
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 py-4">No historical records found for the selected patient.</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(rec => `
+        <div class="relative bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
+          <!-- Timeline Node Icon -->
+          <div class="absolute -left-[35px] top-4 bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-md">
+            <i class="fa-solid fa-calendar-day"></i>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-2">
+            <div>
+              <span class="text-xs font-bold text-sky-600 uppercase">${rec.date}</span>
+              <h4 class="text-base font-bold text-slate-800">${rec.title}</h4>
+              <p class="text-xs text-slate-500">Patient: <span class="font-bold text-slate-700">${rec.patientName} (${rec.patientId})</span> | Doctor: ${rec.docName}</p>
+            </div>
+            <span class="text-xs font-mono bg-white px-2.5 py-1 rounded border border-slate-200 text-slate-600 mt-1 sm:mt-0">${rec.id}</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div>
+              <span class="font-semibold text-slate-700 block mb-1">Symptoms Recorded:</span>
+              <div class="flex flex-wrap gap-1">
+                ${rec.symptoms.map(s => `<span class="bg-sky-100 text-sky-800 px-2 py-0.5 rounded-md font-medium">${s}</span>`).join('')}
+              </div>
+            </div>
+            <div>
+              <span class="font-semibold text-slate-700 block mb-1">Confirmed Diagnosis:</span>
+              <p class="text-slate-600 bg-white p-2 rounded border border-slate-200">${rec.diagnosis}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // RECURRENCE ENGINE (DOCTOR PORTAL)
+    function populateRecurrenceDropdown() {
+      const records = getRecords();
+      const select = document.getElementById("recurrence-episode-select");
+      select.innerHTML = records.map(r => `<option value="${r.id}">${r.date} - ${r.patientName} (${r.title})</option>`).join('');
+      loadRecurrenceReference();
+    }
+
+    function loadRecurrenceReference() {
+      const id = document.getElementById("recurrence-episode-select").value;
+      const records = getRecords();
+      const rec = records.find(r => r.id === id);
+      const card = document.getElementById("recurrence-ref-card");
+
+      if (!rec) return;
+      card.innerHTML = `
+        <div class="font-bold text-slate-800">${rec.title}</div>
+        <p class="text-slate-500">Patient: ${rec.patientName} | Date: ${rec.date}</p>
+        <div>
+          <span class="font-semibold text-slate-700">Baseline Symptoms:</span>
+          <div class="flex flex-wrap gap-1 mt-1">
+            ${rec.symptoms.map(s => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border">${s}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function runRecurrenceEngine() {
+      const id = document.getElementById("recurrence-episode-select").value;
+      const records = getRecords();
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+
+      const currentInput = document.getElementById("recurrence-current-input").value;
+      if (!currentInput.trim()) {
+        showToast("Please enter current patient symptoms to analyze.", "error");
+        return;
+      }
+
+      const currentSymptoms = currentInput.split(",").map(s => s.trim().toLowerCase()).filter(s => s);
+      const historicSymptoms = rec.symptoms.map(s => s.toLowerCase());
+
+      const matched = currentSymptoms.filter(s => historicSymptoms.some(hs => hs.includes(s) || s.includes(hs)));
+      const matchPct = Math.round((matched.length / Math.max(historicSymptoms.length, 1)) * 100);
+
+      const resultBox = document.getElementById("recurrence-result-box");
+      resultBox.classList.remove("hidden");
+
+      let riskColor = "bg-emerald-50 border-emerald-300 text-emerald-900";
+      let riskLabel = "Low Overlap / New Pattern";
+
+      if (matchPct >= 60) {
+        riskColor = "bg-rose-50 border-rose-300 text-rose-900";
+        riskLabel = "High Recurrence Risk Alert";
+      } else if (matchPct >= 30) {
+        riskColor = "bg-amber-50 border-amber-300 text-amber-900";
+        riskLabel = "Moderate Overlap";
+      }
+
+      resultBox.className = `rounded-xl p-5 border ${riskColor} space-y-3`;
+      resultBox.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-sm uppercase tracking-wider">${riskLabel}</span>
+          <span class="text-xl font-extrabold">${matchPct}% Overlap</span>
+        </div>
+        <p class="text-xs">
+          Cross-compared current symptoms with historic episode: <strong>"${rec.title}"</strong> (${rec.date}).
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-2">
+          <div>
+            <strong class="block mb-1">Matching Recurrent Symptoms (${matched.length}):</strong>
+            ${matched.length > 0 
+              ? `<div class="flex flex-wrap gap-1">${matched.map(m => `<span class="bg-white/80 px-2 py-0.5 rounded font-bold border">${m}</span>`).join('')}</div>`
+              : '<span>None matched baseline.</span>'}
+          </div>
+          <div>
+            <strong class="block mb-1">Baseline Reference Symptoms:</strong>
+            <span class="text-slate-700">${rec.symptoms.join(", ")}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // PRECAUTIONS MANAGER (DOCTOR PORTAL)
+    function renderDocPrecautions() {
+      const records = getRecords();
+      const grid = document.getElementById("doc-precautions-grid");
+
+      grid.innerHTML = records.map(rec => `
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
+          <div class="flex justify-between items-start">
+            <h4 class="font-bold text-slate-800 text-sm">${rec.title}</h4>
+            <span class="text-slate-500 font-mono">${rec.patientName}</span>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-900 space-y-1">
+            <span class="font-bold block text-amber-800 flex items-center space-x-1">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Emergency First Aid Guidance:</span>
+            </span>
+            <p>${rec.precautions}</p>
+          </div>
+          <div class="text-slate-500 pt-1 flex justify-between">
+            <span>Prescribed by: ${rec.docName}</span>
+            <span>${rec.date}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // DATABASE TABLE (DOCTOR PORTAL)
+    function renderDatabaseTable() {
+      const records = getRecords();
+      const query = document.getElementById("db-search-input").value.toLowerCase();
+      const tbody = document.getElementById("db-table-body");
+
+      const filtered = records.filter(r => 
+        r.patientName.toLowerCase().includes(query) ||
+        r.patientId.toLowerCase().includes(query) ||
+        r.title.toLowerCase().includes(query) ||
+        r.diagnosis.toLowerCase().includes(query) ||
+        r.symptoms.join(' ').toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 text-xs">No medical records match your search filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(rec => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="p-3">
+            <div class="font-bold text-slate-800">${rec.date}</div>
+            <div class="text-xs font-mono text-slate-400">${rec.id}</div>
+          </td>
+          <td class="p-3">
+            <div class="font-semibold text-slate-800">${rec.patientName}</div>
+            <div class="text-xs text-sky-600 font-mono">${rec.patientId}</div>
+          </td>
+          <td class="p-3 font-medium text-slate-700">${rec.title}</td>
+          <td class="p-3 text-slate-600 max-w-xs truncate" title="${rec.diagnosis}">${rec.diagnosis}</td>
+          <td class="p-3 text-slate-600">${rec.docName}</td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="editRecord('${rec.id}')" title="Edit Record" class="px-2.5 py-1.5 rounded bg-sky-50 text-sky-600 hover:bg-sky-100 text-xs font-semibold">
+              <i class="fa-solid fa-pen"></i> Edit
+            </button>
+            <button onclick="deleteRecord('${rec.id}')" title="Delete Record" class="px-2.5 py-1.5 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-semibold">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDoctorPortal() {
+      updateStats();
+      renderDocTimeline();
+      populateRecurrenceDropdown();
+      renderDocPrecautions();
+      renderDatabaseTable();
+    }
+    // =========================================================================
+    // 3. PATIENT PORTAL LOGIC
+    // =========================================================================
+    function loadPatientPortal() {
+      const records = getRecords();
+      const lookupId = document.getElementById("patient-lookup-id").value.trim().toUpperCase();
+      
+      const patientRecords = records.filter(r => r.patientId.toUpperCase() === lookupId);
+
+      if (patientRecords.length === 0) {
+        showToast(`No patient records found for ID: ${lookupId}`, "error");
+        document.getElementById("patient-reports-list").innerHTML = `
+          <div class="p-6 text-center text-slate-400 text-xs bg-slate-50 rounded-xl border">
+            No health records linked to patient ID: <strong>${lookupId}</strong>.
+          </div>`;
+        document.getElementById("patient-precautions-list").innerHTML = `<p class="text-xs text-slate-500">No instructions available.</p>`;
+        return;
+      }
+
+      // Latest record provides current patient name & attending physician details
+      const latestRec = patientRecords[0];
+
+      // Update Patient Profile Card
+      document.getElementById("patient-card-name").innerText = latestRec.patientName;
+      document.getElementById("patient-card-id").innerText = latestRec.patientId;
+      document.getElementById("patient-card-records-count").innerText = `${patientRecords.length} Episode(s) On File`;
+
+      // Update Attending Doctor Contact Card
+      document.getElementById("patient-doc-name").innerText = latestRec.docName;
+      document.getElementById("patient-doc-spec").innerText = latestRec.docSpecialty || "Attending Physician";
+      
+      if (latestRec.docContact) {
+        document.getElementById("patient-doc-call").href = `tel:${latestRec.docContact.split('|')[0].trim()}`;
+        document.getElementById("patient-doc-email").href = `mailto:${latestRec.docContact.split('|')[1] ? latestRec.docContact.split('|')[1].trim() : 'doctor@medimemory.org'}`;
+      }
+
+      // Render Reports History
+      const reportsContainer = document.getElementById("patient-reports-list");
+      reportsContainer.innerHTML = patientRecords.map(rec => `
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+            <div>
+              <span class="text-xs font-bold text-emerald-600 uppercase">${rec.date}</span>
+              <h4 class="text-lg font-bold text-slate-800">${rec.title}</h4>
+              <p class="text-xs text-slate-500">Recorded by: ${rec.docName}</p>
+            </div>
+            <span class="self-start sm:self-auto text-xs font-mono bg-white px-2.5 py-1 rounded border text-slate-500">${rec.id}</span>
+          </div>
+
+          <!-- Symptoms Tags -->
+          <div>
+            <span class="text-xs font-bold text-slate-700 block mb-1">Your Reported Symptoms:</span>
+            <div class="flex flex-wrap gap-1">
+              ${rec.symptoms.map(s => `<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-md">${s}</span>`).join('')}
+            </div>
+          </div>
+
+          <!-- Pre & Confirmed Diagnosis -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            ${rec.preDiagnosis ? `
+              <div class="bg-white p-3 rounded-lg border border-slate-200">
+                <span class="font-bold text-slate-700 block mb-1">Pre-Diagnosis Observations:</span>
+                <p class="text-slate-600">${rec.preDiagnosis}</p>
+              </div>
+            ` : ''}
+            <div class="bg-white p-3 rounded-lg border border-slate-200 ${!rec.preDiagnosis ? 'md:col-span-2' : ''}">
+              <span class="font-bold text-slate-700 block mb-1">Confirmed Clinical Diagnosis:</span>
+              <p class="text-slate-800 font-medium">${rec.diagnosis}</p>
+            </div>
+          </div>
+
+          <!-- Prescriptions & Dosage -->
+          <div class="bg-emerald-50/50 border border-emerald-200/80 p-4 rounded-xl text-xs space-y-1">
+            <span class="font-bold text-emerald-900 text-sm flex items-center space-x-1">
+              <i class="fa-solid fa-pills text-emerald-600"></i>
+              <span>Prescribed Medications & Dosage:</span>
+            </span>
+            <div class="text-slate-700 whitespace-pre-line leading-relaxed font-mono bg-white/70 p-3 rounded-lg border border-emerald-100 mt-2">
+              ${rec.prescription}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Render Approved First-Aid & Precautions
+      const precautionsContainer = document.getElementById("patient-precautions-list");
+      precautionsContainer.innerHTML = patientRecords.map(rec => `
+        <div class="bg-white p-3.5 rounded-xl border border-amber-200/60 text-xs space-y-1">
+          <div class="font-bold text-amber-900">${rec.title} (${rec.date})</div>
+          <p class="text-slate-700 leading-normal">${rec.precautions}</p>
+        </div>
+      `).join('');
+    }
+
+    // PATIENT SELF RECURRENCE CHECKER
+    function runPatientSelfCheck() {
+      const lookupId = document.getElementById("patient-lookup-id").value.trim().toUpperCase();
+      const records = getRecords().filter(r => r.patientId.toUpperCase() === lookupId);
+      const input = document.getElementById("patient-symptom-check-input").value.trim();
+
+      if (!input) {
+        showToast("Please enter current symptoms to run comparison.", "error");
+        return;
+      }
+
+      if (records.length === 0) {
+        showToast("No historical patient records to compare against.", "error");
+        return;
+      }
+
+      const currentSymptoms = input.split(",").map(s => s.trim().toLowerCase()).filter(s => s);
+      let highestMatch = null;
+      let maxScore = -1;
+
+      records.forEach(rec => {
+        const historic = rec.symptoms.map(s => s.toLowerCase());
+        const matched = currentSymptoms.filter(cs => historic.some(hs => hs.includes(cs) || cs.includes(hs)));
+        if (matched.length > maxScore) {
+          maxScore = matched.length;
+          highestMatch = { record: rec, matched: matched, total: historic.length };
+        }
+      });
+
+      const resultsDiv = document.getElementById("patient-check-results");
+      resultsDiv.classList.remove("hidden");
+
+      if (maxScore > 0 && highestMatch) {
+        const matchPct = Math.round((highestMatch.matched.length / highestMatch.total) * 100);
+        resultsDiv.className = "rounded-xl p-4 text-xs space-y-2 bg-amber-50 border border-amber-300 text-amber-900";
+        resultsDiv.innerHTML = `
+          <div class="flex items-center justify-between font-bold">
+            <span>Historical Match Found</span>
+            <span>${matchPct}% Match</span>
+          </div>
+          <p>Your entered symptoms match your past episode: <strong>"${highestMatch.record.title}"</strong> (${highestMatch.record.date}).</p>
+          <div class="pt-1">
+            <strong>Matched Symptoms:</strong> ${highestMatch.matched.join(", ")}
+          </div>
+          <div class="bg-white/80 p-2.5 rounded border border-amber-200 text-slate-800 mt-2">
+            <strong>Recommended Doctor Advice:</strong> ${highestMatch.record.precautions}
+          </div>
+        `;
+      } else {
+        resultsDiv.className = "rounded-xl p-4 text-xs space-y-2 bg-slate-100 border border-slate-300 text-slate-800";
+        resultsDiv.innerHTML = `
+          <div class="font-bold">No Exact Historical Overlap</div>
+          <p>Your current symptoms do not closely match your past recorded medical episodes. If symptoms persist or worsen, please contact your doctor directly.</p>
+        `;
+      }
+    }
+
+    // INITIALIZATION ON WINDOW LOAD
+    window.onload = function() {
+      // Set today's date in episode form
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("form-date").value = today;
+
+      // Initialize Doctor Portal
+      renderDoctorPortal();
+    };
+  </script>
+</body>
+</html>
