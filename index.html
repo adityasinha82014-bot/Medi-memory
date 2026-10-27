@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediMemory – Medical History & Recurrence Support System</title>
+    <!-- Tailwind CSS for sleek, clean healthcare UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medical: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#095178',
+                            800: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 23px;
+            width: 3px;
+            background: #cbd5e1;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-medical-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl text-slate-900 leading-tight">MediMemory</h1>
+                    <p class="text-xs text-slate-500 font-medium">Recurrence Support & Medical History</p>
+                </div>
+            </div>
+
+            <!-- INTERFACE ROLE TOGGLE SWITCH -->
+            <div class="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                <button id="nav-doctor" onclick="switchRole('doctor')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-user-doctor"></i> Doctor Interface
+                </button>
+                <button id="nav-patient" onclick="switchRole('patient')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-medical-600 shadow-sm">
+                    <i class="fa-solid fa-user"></i> Patient Interface
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= DOCTOR INTERFACE ================= -->
+        <section id="doctor-portal" class="hidden space-y-6">
+            <div class="bg-sky-900 text-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="bg-sky-700/60 text-sky-200 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Step 1: Doctor Consultation</span>
+                    <h2 class="text-2xl font-bold mt-1">Record Medical Episode</h2>
+                    <p class="text-sky-200 text-sm">Add diagnosed illness episodes to build the patient's long-term timeline.</p>
+                </div>
+                <div class="bg-sky-800/80 p-3 rounded-xl border border-sky-700 text-xs text-sky-100">
+                    <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Data synced to Patient Portal instantly
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- FORM -->
+                <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <form id="episode-form" onsubmit="handleSaveEpisode(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Patient ID *</label>
+                                <input type="text" id="doc-patient-id" required placeholder="e.g. PT-1004" value="PT-1004" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Patient Full Name *</label>
+                                <input type="text" id="doc-patient-name" required placeholder="e.g. Rahul Sharma" value="Rahul Sharma" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Episode Title / Illness *</label>
+                                <input type="text" id="doc-illness" required placeholder="e.g. Acute Gastritis & Acidity" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Consultation Date *</label>
+                                <input type="date" id="doc-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Primary Symptoms (Comma Separated) *</label>
+                            <input type="text" id="doc-symptoms" required placeholder="e.g. Upper abdominal pain, Nausea, Bloating, Heartburn" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Pre-Diagnosis Symptoms / Notes</label>
+                                <textarea id="doc-prediag" rows="2" placeholder="Initial observations before lab tests..." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Confirmed Diagnosis & Severity</label>
+                                <textarea id="doc-postdiag" rows="2" placeholder="Confirmed diagnostic results..." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Prescribed First-Aid / Emergency Drugs</label>
+                                <textarea id="doc-treatment" rows="3" placeholder="e.g. Pantoprazole 40mg (Before breakfast), Antacid Gel as needed" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Precautions & Red-Flag Warnings</label>
+                                <textarea id="doc-precautions" rows="3" placeholder="e.g. Avoid spicy meals. Seek emergency care if severe pain or vomiting persists." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit" class="bg-medical-600 hover:bg-medical-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Save Episode to MediMemory
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SIDEBAR RECENTS -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                        <h3 class="font-bold text-slate-900 text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-medical-600"></i> Recently Added Episodes
+                        </h3>
+                        <div id="doc-recent-list" class="space-y-3">
+                            <!-- Dynamic recent list -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PATIENT INTERFACE ================= -->
+        <section id="patient-portal" class="space-y-8">
+            <!-- HEADER SEARCH -->
+            <div class="bg-gradient-to-r from-medical-700 to-sky-900 text-white rounded-2xl p-6 sm:p-8 shadow-lg">
+                <div class="max-w-3xl">
+                    <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Step 2 & 3: Memory Timeline & Recurrence Support</span>
+                    <h2 class="text-3xl font-bold mt-2">Patient Health Memory Portal</h2>
+                    <p class="text-sky-100 mt-1 text-sm sm:text-base">Review your past illness episodes, verify approved doctor precautions, and compare recurring symptoms across years.</p>
+                </div>
+
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="text" id="patient-search-id" value="PT-1004" placeholder="Enter Patient ID (e.g. PT-1004)" class="w-full pl-11 pr-4 py-3 rounded-xl bg-white text-slate-900 font-semibold focus:outline-none shadow-sm">
+                    </div>
+                    <button onclick="loadPatientTimeline()" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold px-6 py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-folder-open"></i> Fetch Timeline
+                    </button>
+                </div>
+            </div>
+
+            <!-- RECURRENCE COMPARISON SECTION (STEP 4) -->
+            <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-9 h-9 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-lg">Recurrence Symptom Comparison Engine</h3>
+                        <p class="text-xs text-slate-600">Compare your current symptoms with earlier diagnosed episodes to support your doctor consultation.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-5 rounded-xl border border-amber-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">1. Select Historical Episode</label>
+                        <select id="compare-episode-select" onchange="runComparison()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none">
+                            <option value="">-- Choose Past Episode --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">2. Enter Current Symptoms</label>
+                        <input type="text" id="compare-current-symptoms" placeholder="e.g. Upper abdominal pain, Nausea, Fever" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="runComparison()" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow">
+                            Compare Episodes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COMPARISON RESULT DISPLAY -->
+                <div id="comparison-result" class="hidden mt-4 bg-white p-5 rounded-xl border border-slate-200 space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h4 class="font-bold text-slate-800 text-sm">Comparison Analysis Result</h4>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium" id="comp-date-badge"></span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                            <span class="text-xs font-bold text-emerald-800 uppercase block mb-1"><i class="fa-solid fa-circle-check"></i> Matching Symptoms (Recurring)</span>
+                            <p id="comp-matches" class="text-slate-800 font-medium"></p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <span class="text-xs font-bold text-slate-600 uppercase block mb-1"><i class="fa-solid fa-circle-info"></i> New / Unique Symptoms</span>
+                            <p id="comp-differences" class="text-slate-800 font-medium"></p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-amber-700 bg-amber-100/60 p-2 rounded border border-amber-200/50">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Medical Disclaimer:</strong> This comparison highlights pattern similarities for review. It does not independently provide a clinical diagnosis. Always consult a licensed doctor for fresh evaluations.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TIMELINE & DETAILS SECTION -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- TIMELINE (LEFT 2 COLS) -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-900 text-xl flex items-center gap-2">
+                            <i class="fa-solid fa-timeline text-medical-600"></i> Medical Memory Timeline
+                        </h3>
+                        <span id="patient-name-display" class="text-sm font-semibold text-slate-500">Showing for: Rahul Sharma (PT-1004)</span>
+                    </div>
+
+                    <div class="relative timeline-line pl-12 space-y-6 pt-2" id="timeline-container">
+                        <!-- Dynamic Timeline Items -->
+                    </div>
+                </div>
+
+                <!-- PRECAUTIONS & EMERGENCY GUIDANCE (RIGHT COL) -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm sticky top-24">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4 flex items-center gap-2 border-b pb-3">
+                            <i class="fa-solid fa-kit-medical text-rose-500"></i> Active Precautions & Guidance
+                        </h3>
+                        <div id="precautions-container" class="space-y-4">
+                            <!-- Dynamic Precautions -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p><strong>MediMemory</strong> – Web Technology Academic Mini-Project Demonstration</p>
+            <p class="mt-1">Built with HTML5, CSS (Tailwind), JavaScript & LocalStorage</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // FICTIONAL DEMO DATA (SIMULATING 2024 vs 2026 RECURRING STOMACH PAIN EPISODE)
+        const sampleEpisodes = [
+            {
+                id: 'EP-9012',
+                patientId: 'PT-1004',
+                patientName: 'Rahul Sharma',
+                illness: 'Acute Gastritis & Acidity',
+                date: '2024-03-15',
+                symptoms: ['Upper abdominal pain', 'Nausea', 'Heartburn', 'Bloating'],
+                preDiag: 'Patient reported burning chest sensation and sharp epigastric pain after meals.',
+                postDiag: 'Confirmed Acute Gastritis secondary to irregular dietary habits.',
+                treatment: 'Pantoprazole 40mg once daily before breakfast (14 days), Antacid Syrup 10ml post meals.',
+                precautions: 'Avoid spicy, greasy foods and late-night meals. Drink adequate water. Return if dark stools occur.'
+            },
+            {
+                id: 'EP-9844',
+                patientId: 'PT-1004',
+                patientName: 'Rahul Sharma',
+                illness: 'Recurrent Epigastric Pain',
+                date: '2026-10-10',
+                symptoms: ['Upper abdominal pain', 'Heartburn', 'Loss of appetite'],
+                preDiag: 'Recurring stomach irritation following intense stressful work schedule.',
+                postDiag: 'Mild Mild Gastroesophageal Reflux Flare-up.',
+                treatment: 'Rabeprazole 20mg, Probiotics.',
+                precautions: 'Maintain regular meal timings. Do not lie down immediately after eating.'
+            }
+        ];
+
+        // INITIALIZE STORAGE
+        function getStoredEpisodes() {
+            const data = localStorage.getItem('medi_memory_episodes');
+            if (!data) {
+                localStorage.setItem('medi_memory_episodes', JSON.stringify(sampleEpisodes));
+                return sampleEpisodes;
+            }
+            return JSON.parse(data);
+        }
+
+        // ROLE SWITCHER
+        function switchRole(role) {
+            const docPortal = document.getElementById('doctor-portal');
+            const patientPortal = document.getElementById('patient-portal');
+            const
