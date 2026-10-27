@@ -1,702 +1,323 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediMemory – Medical History & Recurrence Support System</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        medical: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#095178',
-                            800: '#075985',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .timeline-line::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 23px;
-            width: 3px;
-            background: #cbd5e1;
-            z-index: 0;
-        }
-        .page-view {
-            display: none;
-        }
-        .page-view.active {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediMemory - Recurrence Support & Patient Health Portal</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .tab-active { border-bottom: 3px solid #0284c7; color: #0284c7; font-weight: 600; }
+    .portal-active { background-color: #0284c7; color: #ffffff; }
+    .portal-inactive { background-color: #f1f5f9; color: #475569; }
+    .portal-inactive:hover { background-color: #e2e8f0; }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- NAVIGATION HEADER -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- LOGO -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
-                    <div class="w-10 h-10 rounded-xl bg-medical-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-xl text-slate-900 leading-tight">MediMemory</h1>
-                        <p class="text-xs text-slate-500 font-medium">Recurrence Support System</p>
-                    </div>
-                </div>
-
-                <!-- DESKTOP NAVBAR (6 WEBPAGES) -->
-                <nav class="hidden md:flex items-center space-x-1 text-sm font-semibold">
-                    <button onclick="navigateTo('home')" id="nav-home" class="nav-link px-3 py-2 rounded-lg text-medical-600 bg-medical-50">
-                        <i class="fa-solid fa-house mr-1"></i> Home
-                    </button>
-                    <button onclick="navigateTo('doctor')" id="nav-doctor" class="nav-link px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                        <i class="fa-solid fa-user-doctor mr-1"></i> Doctor Portal
-                    </button>
-                    <button onclick="navigateTo('timeline')" id="nav-timeline" class="nav-link px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                        <i class="fa-solid fa-timeline mr-1"></i> Medical Timeline
-                    </button>
-                    <button onclick="navigateTo('recurrence')" id="nav-recurrence" class="nav-link px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                        <i class="fa-solid fa-code-compare mr-1"></i> Recurrence Engine
-                    </button>
-                    <button onclick="navigateTo('guidance')" id="nav-guidance" class="nav-link px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                        <i class="fa-solid fa-kit-medical mr-1"></i> Precautions
-                    </button>
-                    <button onclick="navigateTo('manager')" id="nav-manager" class="nav-link px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                        <i class="fa-solid fa-database mr-1"></i> Records Database
-                    </button>
-                </nav>
-
-                <!-- MOBILE MENU BUTTON -->
-                <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="p-2 text-slate-600 hover:text-slate-900">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- MOBILE MENU DROPDOWN -->
-            <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-1 text-sm font-semibold border-t pt-2">
-                <button onclick="navigateTo('home')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Home</button>
-                <button onclick="navigateTo('doctor')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Doctor Portal</button>
-                <button onclick="navigateTo('timeline')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Medical Timeline</button>
-                <button onclick="navigateTo('recurrence')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Recurrence Engine</button>
-                <button onclick="navigateTo('guidance')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Precautions & First-Aid</button>
-                <button onclick="navigateTo('manager')" class="block w-full text-left px-3 py-2 rounded-lg text-slate-700">Records Database</button>
-            </div>
+  <!-- TOP APP BAR / HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo & App Branding -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+          <i class="fa-solid fa-heart-pulse text-xl"></i>
         </div>
-    </header>
+        <div>
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight leading-none">MediMemory</h1>
+          <p class="text-xs text-slate-500 font-medium tracking-wide">Recurrence Support System & Patient Portal</p>
+        </div>
+      </div>
 
-    <!-- MAIN BODY CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- MAIN PORTAL SWITCHER (ONLY 2 MAIN SWITCHERS) -->
+      <nav class="flex items-center space-x-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+        <button id="nav-doctor-btn" onclick="switchPortal('doctor')" class="px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-active">
+          <i class="fa-solid fa-user-md text-base"></i>
+          <span>Doctor Portal</span>
+        </button>
+        <button id="nav-patient-btn" onclick="switchPortal('patient')" class="px-5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 portal-inactive">
+          <i class="fa-solid fa-hospital-user text-base"></i>
+          <span>Patient Portal</span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
-        <!-- ================= PAGE 1: HOME / DASHBOARD ================= -->
-        <section id="page-home" class="page-view active space-y-8">
-            <!-- HERO HERO -->
-            <div class="bg-gradient-to-r from-medical-800 to-sky-900 text-white rounded-3xl p-8 shadow-lg">
-                <div class="max-w-3xl space-y-4">
-                    <span class="bg-white/20 text-white text-xs px-3.5 py-1.5 rounded-full font-bold uppercase tracking-wider">Web-Based Healthcare Management System</span>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold leading-tight">Welcome to MediMemory</h2>
-                    <p class="text-sky-100 text-base leading-relaxed">Organizing long-term medical histories into distinct illness episodes. MediMemory enables patients and doctors to bridge past medical events with current symptoms for faster recurrence detection.</p>
-                    <div class="pt-2 flex flex-wrap gap-4">
-                        <button onclick="navigateTo('doctor')" class="bg-medical-500 hover:bg-medical-600 text-white px-6 py-3 rounded-xl font-bold transition shadow-md">
-                            <i class="fa-solid fa-stethoscope mr-1"></i> Doctor Portal
-                        </button>
-                        <button onclick="navigateTo('timeline')" class="bg-white text-slate-900 hover:bg-slate-100 px-6 py-3 rounded-xl font-bold transition shadow-md">
-                            <i class="fa-solid fa-clock-rotate-left mr-1"></i> View Patient Timeline
-                        </button>
-                    </div>
-                </div>
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Notification / Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. DOCTOR PORTAL SECTION                                                 -->
+    <!-- ========================================================================= -->
+    <section id="doctor-portal-section" class="block space-y-6">
+      
+      <!-- Doctor Banner / Overview Bar -->
+      <div class="bg-gradient-to-r from-sky-800 to-indigo-900 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <span class="bg-sky-500/30 text-sky-200 text-xs uppercase font-bold tracking-wider px-3 py-1 rounded-full border border-sky-400/30">Clinical Interface</span>
+          <h2 class="text-2xl font-extrabold mt-2">Physician Workstation & Episode Records</h2>
+          <p class="text-sky-100 text-sm mt-1 max-w-2xl">Log medical history, diagnose symptoms, track recurring patterns across episodes, and manage patient prescriptions & precautions.</p>
+        </div>
+        <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 text-xs">
+          <i class="fa-solid fa-database text-sky-300 text-lg"></i>
+          <div>
+            <div class="text-slate-300">Data Storage</div>
+            <div id="doc-sync-status" class="font-bold text-emerald-400">LocalStorage Active</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Stats Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="p-3 bg-sky-50 text-sky-600 rounded-lg"><i class="fa-solid fa-folder-open text-xl"></i></div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">TOTAL EPISODES</p>
+            <h3 id="stat-total-episodes" class="text-2xl font-bold text-slate-800">0</h3>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">REGISTERED PATIENTS</p>
+            <h3 id="stat-total-patients" class="text-2xl font-bold text-slate-800">0</h3>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-rotate text-xl"></i></div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">RECURRENCE CHECKS</p>
+            <h3 id="stat-recurrence-status" class="text-2xl font-bold text-slate-800">Active</h3>
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-shield-heart text-xl"></i></div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">ACTIVE PRECAUTIONS</p>
+            <h3 id="stat-precautions-count" class="text-2xl font-bold text-slate-800">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Sub-Tabs Navigation -->
+      <div class="border-b border-slate-200 bg-white rounded-xl shadow-sm px-4 pt-2 flex flex-wrap gap-2 md:gap-6 text-sm font-medium">
+        <button onclick="switchDocTab('add-episode')" id="doc-tab-add-episode" class="tab-active py-3 px-2 flex items-center space-x-2">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Upload / Add Episode</span>
+        </button>
+        <button onclick="switchDocTab('timeline')" id="doc-tab-timeline" class="text-slate-500 hover:text-slate-800 py-3 px-2 flex items-center space-x-2">
+          <i class="fa-solid fa-timeline"></i>
+          <span>Medical Timeline</span>
+        </button>
+        <button onclick="switchDocTab('recurrence')" id="doc-tab-recurrence" class="text-slate-500 hover:text-slate-800 py-3 px-2 flex items-center space-x-2">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Recurrence Engine</span>
+        </button>
+        <button onclick="switchDocTab('precautions')" id="doc-tab-precautions" class="text-slate-500 hover:text-slate-800 py-3 px-2 flex items-center space-x-2">
+          <i class="fa-solid fa-kit-medical"></i>
+          <span>Precautions & Emergency Manager</span>
+        </button>
+        <button onclick="switchDocTab('database')" id="doc-tab-database" class="text-slate-500 hover:text-slate-800 py-3 px-2 flex items-center space-x-2">
+          <i class="fa-solid fa-table-list"></i>
+          <span>Records Database</span>
+        </button>
+      </div>
+
+      <!-- DOCTOR TAB CONTENT 1: ADD / UPLOAD EPISODE -->
+      <div id="doc-panel-add-episode" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+              <i class="fa-solid fa-file-medical text-sky-600"></i>
+              <span id="form-heading">Log New Clinical Episode</span>
+            </h3>
+            <p class="text-xs text-slate-500">Record a patient's symptoms, diagnosis, prescribed treatments, and first-aid instructions.</p>
+          </div>
+          <button id="btn-cancel-edit" onclick="resetEpisodeForm()" class="hidden text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg">
+            <i class="fa-solid fa-xmark mr-1"></i> Cancel Edit Mode
+          </button>
+        </div>
+
+        <form id="episode-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+          <input type="hidden" id="edit-record-id" value="" />
+
+          <!-- Patient & Attending Physician Info -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Patient ID *</label>
+              <input type="text" id="form-patient-id" required placeholder="e.g. PT-1004" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-
-            <!-- DASHBOARD STATS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-sky-100 text-medical-600 flex items-center justify-center font-bold text-xl">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase">Total Episodes</p>
-                        <h3 class="text-2xl font-extrabold text-slate-900" id="stat-total-episodes">0</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xl">
-                        <i class="fa-solid fa-hospital-user"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase">Registered Patients</p>
-                        <h3 class="text-2xl font-extrabold text-slate-900" id="stat-total-patients">0</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl">
-                        <i class="fa-solid fa-rotate"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase">Recurrence Checks</p>
-                        <h3 class="text-2xl font-extrabold text-slate-900">Active</h3>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">
-                        <i class="fa-solid fa-database"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase">Data Sync Status</p>
-                        <h3 class="text-sm font-bold text-emerald-600">LocalStorage Active</h3>
-                    </div>
-                </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Patient Full Name *</label>
+              <input type="text" id="form-patient-name" required placeholder="e.g. Rahul Sharma" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-
-            <!-- SYSTEM MODULES NAVIGATION GRID -->
-            <div class="space-y-4">
-                <h3 class="text-xl font-bold text-slate-900">System Modules</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="navigateTo('doctor')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-medical-500 hover:shadow-md transition cursor-pointer space-y-3">
-                        <div class="w-10 h-10 rounded-lg bg-sky-100 text-medical-600 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-user-doctor"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-900 text-lg">1. Doctor Interface</h4>
-                        <p class="text-sm text-slate-600">Log detailed clinical reports, symptoms, pre/post diagnosis, prescriptions, and warnings.</p>
-                    </div>
-
-                    <div onclick="navigateTo('timeline')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-medical-500 hover:shadow-md transition cursor-pointer space-y-3">
-                        <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-timeline"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-900 text-lg">2. Memory Timeline</h4>
-                        <p class="text-sm text-slate-600">View chronological patient history grouped by illness episodes over multi-year spans.</p>
-                    </div>
-
-                    <div onclick="navigateTo('recurrence')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-medical-500 hover:shadow-md transition cursor-pointer space-y-3">
-                        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-code-compare"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-900 text-lg">3. Recurrence Engine</h4>
-                        <p class="text-sm text-slate-600">Cross-compare current symptoms with historical episodes to highlight symptom overlaps.</p>
-                    </div>
-                </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Episode Date *</label>
+              <input type="date" id="form-date" required class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-        </section>
-
-        <!-- ================= PAGE 2: DOCTOR INTERFACE ================= -->
-        <section id="page-doctor" class="page-view space-y-6">
-            <div class="bg-sky-900 text-white rounded-2xl p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <span class="bg-sky-700 text-sky-200 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Step 1: Clinical Data Entry</span>
-                    <h2 class="text-2xl font-bold mt-1">Doctor Portal — Record Episode</h2>
-                    <p class="text-sky-200 text-sm">Add diagnosed illness episodes into the patient's permanent health record.</p>
-                </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Attending Doctor Name *</label>
+              <input type="text" id="form-doc-name" required placeholder="e.g. Dr. Ananya Sen, MD" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <form id="episode-form" onsubmit="handleSaveEpisode(event)" class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Patient ID *</label>
-                            <input type="text" id="doc-patient-id" required placeholder="e.g. PT-1004" value="PT-1004" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Patient Full Name *</label>
-                            <input type="text" id="doc-patient-name" required placeholder="e.g. Rahul Sharma" value="Rahul Sharma" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Episode Title / Illness *</label>
-                            <input type="text" id="doc-illness" required placeholder="e.g. Acute Gastritis & Acidity" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Consultation Date *</label>
-                            <input type="date" id="doc-date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Primary Symptoms (Comma Separated) *</label>
-                        <input type="text" id="doc-symptoms" required placeholder="Upper abdominal pain, Nausea, Bloating, Heartburn" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 focus:outline-none text-sm">
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Pre-Diagnosis Observations</label>
-                            <textarea id="doc-prediag" rows="2" placeholder="Initial physical examination notes..." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 text-sm"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Confirmed Diagnosis</label>
-                            <textarea id="doc-postdiag" rows="2" placeholder="Final diagnostic conclusions..." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 text-sm"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Prescribed Treatments / Medications</label>
-                            <textarea id="doc-treatment" rows="3" placeholder="e.g. Pantoprazole 40mg before breakfast for 14 days" class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 text-sm"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Doctor Precautions & Warning Signs</label>
-                            <textarea id="doc-precautions" rows="3" placeholder="e.g. Avoid spicy meals. Seek emergency care if vomiting persists." class="w-full px-4 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-medical-500 text-sm"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-medical-600 hover:bg-medical-700 text-white font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center gap-2">
-                            <i class="fa-solid fa-save"></i> Save Episode to MediMemory
-                        </button>
-                    </div>
-                </form>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Doctor Specialty</label>
+              <input type="text" id="form-doc-specialty" placeholder="e.g. Senior Pulmonologist" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-        </section>
-
-        <!-- ================= PAGE 3: MEDICAL MEMORY TIMELINE ================= -->
-        <section id="page-timeline" class="page-view space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Medical Memory Timeline</h2>
-                    <p class="text-sm text-slate-500">Chronological list of all recorded illness episodes.</p>
-                </div>
-                <!-- SEARCH BAR -->
-                <div class="flex items-center gap-2">
-                    <input type="text" id="search-patient-id" value="PT-1004" placeholder="Enter Patient ID" class="px-4 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none">
-                    <button onclick="renderTimeline()" class="bg-medical-600 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-medical-700">
-                        Search ID
-                    </button>
-                </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Doctor Contact Email / Phone</label>
+              <input type="text" id="form-doc-contact" placeholder="e.g. dr.ananya@medimemory.org | +91 98765-43210" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
+          </div>
 
-            <div class="relative timeline-line pl-12 space-y-6 pt-2" id="timeline-container">
-                <!-- Dynamically Populated Timeline Cards -->
+          <!-- Clinical Episode Details -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Illness / Episode Title *</label>
+              <input type="text" id="form-title" required placeholder="e.g. Acute Bronchial Asthma Exacerbation" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
-        </section>
-
-        <!-- ================= PAGE 4: RECURRENCE ENGINE ================= -->
-        <section id="page-recurrence" class="page-view space-y-6">
-            <div class="bg-amber-500 text-white rounded-2xl p-6 shadow-md">
-                <span class="bg-amber-700 text-amber-100 text-xs px-3 py-1 rounded-full font-bold uppercase">Step 4: Recurrence Comparison Engine</span>
-                <h2 class="text-2xl font-bold mt-1">Symptom Comparison Tool</h2>
-                <p class="text-amber-100 text-sm">Compare your current symptoms against past documented medical episodes.</p>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Recorded Symptoms (Comma separated) *</label>
+              <input type="text" id="form-symptoms" required placeholder="e.g. Shortness of breath, Wheezing, Dry Cough, Chest tightness" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none" />
             </div>
+          </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">1. Select Historical Episode</label>
-                        <select id="compare-episode-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none">
-                            <option value="">-- Choose Past Episode --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">2. Enter Current Symptoms (Comma Separated)</label>
-                        <input type="text" id="compare-current-symptoms" placeholder="e.g. Upper abdominal pain, Heartburn, Fever" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none">
-                    </div>
-                </div>
-
-                <button onclick="runComparison()" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl text-sm transition shadow">
-                    Run Recurrence Analysis
-                </button>
+          <!-- Diagnoses -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Pre-Diagnosis Observations</label>
+              <textarea id="form-pre-diag" rows="3" placeholder="Initial clinical presentation, preliminary chest sound notes, vitals..." class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
             </div>
-
-            <!-- RESULT -->
-            <div id="comparison-result" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <h3 class="font-bold text-slate-900 text-base">Recurrence Analysis Results</h3>
-                    <span id="comp-date-badge" class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium"></span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                        <span class="text-xs font-bold text-emerald-800 uppercase block mb-1">
-                            <i class="fa-solid fa-circle-check"></i> Matching Symptoms (Recurring Pattern)
-                        </span>
-                        <p id="comp-matches" class="text-slate-800 font-semibold"></p>
-                    </div>
-
-                    <div class="bg-sky-50 p-4 rounded-xl border border-sky-200">
-                        <span class="text-xs font-bold text-sky-800 uppercase block mb-1">
-                            <i class="fa-solid fa-circle-info"></i> New / Distinct Symptoms
-                        </span>
-                        <p id="comp-differences" class="text-slate-800 font-semibold"></p>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800">
-                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> <strong>Medical Disclaimer:</strong> This comparison highlights patterns to assist your consultation. It is not an automated medical diagnosis.
-                </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Confirmed Diagnosis *</label>
+              <textarea id="form-diagnosis" required rows="3" placeholder="Final verified clinical diagnosis and severity stage..." class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
             </div>
-        </section>
+          </div>
 
-        <!-- ================= PAGE 5: PRECAUTIONS & FIRST-AID ================= -->
-        <section id="page-guidance" class="page-view space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <h2 class="text-2xl font-bold text-slate-900">Doctor-Approved Precautions & Guidelines</h2>
-                <p class="text-sm text-slate-500">Active instructions and first-aid recommendations from your historical consultations.</p>
+          <!-- Medications & Precautions -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Prescribed Medications & Dosage *</label>
+              <textarea id="form-prescription" required rows="3" placeholder="e.g. Salbutamol Inhaler (2 puffs 4x daily), Budesonide 200mcg..." class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
             </div>
-
-            <div id="guidance-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Dynamically Populated Precautions Cards -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">First Aid & Warning Precautions *</label>
+              <textarea id="form-precautions" required rows="3" placeholder="e.g. Keep inhaler reachable. Sit upright during acute wheezing. Seek ER if oxygen drops below 92%." class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
             </div>
-        </section>
+          </div>
 
-        <!-- ================= PAGE 6: RECORDS DATABASE MANAGER ================= -->
-        <section id="page-manager" class="page-view space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Medical Records Database</h2>
-                    <p class="text-sm text-slate-500">View and manage all saved patient episodes in browser local storage.</p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="exportDatabaseJSON()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition">
-                        <i class="fa-solid fa-download mr-1"></i> Export JSON
-                    </button>
-                    <button onclick="resetDemoData()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold px-4 py-2 rounded-xl transition">
-                        <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset Demo Data
-                    </button>
-                </div>
+          <div class="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+            <button type="button" onclick="resetEpisodeForm()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 text-sm font-semibold">Clear Form</button>
+            <button type="submit" id="btn-submit-form" class="px-6 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold shadow-md flex items-center space-x-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Save Clinical Record</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- DOCTOR TAB CONTENT 2: TIMELINE -->
+      <div id="doc-panel-timeline" class="hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-4 gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+              <i class="fa-solid fa-timeline text-sky-600"></i>
+              <span>Chronological Patient History Timeline</span>
+            </h3>
+            <p class="text-xs text-slate-500">Filter timeline events by patient to review historic flare-ups and episode patterns.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <label class="text-xs font-semibold text-slate-600">Filter Patient:</label>
+            <select id="doc-timeline-patient-filter" onchange="renderDocTimeline()" class="text-xs px-3 py-2 border rounded-lg bg-slate-50 focus:outline-none">
+              <!-- Dynamically Populated -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Timeline Display Container -->
+        <div id="doc-timeline-container" class="relative border-l-2 border-sky-200 ml-4 pl-6 space-y-8 py-2">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- DOCTOR TAB CONTENT 3: RECURRENCE ENGINE -->
+      <div id="doc-panel-recurrence" class="hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-microscope text-sky-600"></i>
+            <span>Recurrence Symptom Comparison Engine</span>
+          </h3>
+          <p class="text-xs text-slate-500">Select a historical episode and enter current patient symptoms to analyze percentage overlap and potential recurrence risk.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Select Historic Episode for Reference</label>
+            <select id="recurrence-episode-select" onchange="loadRecurrenceReference()" class="w-full text-sm px-3 py-2 border rounded-lg bg-white focus:outline-none">
+              <!-- Dynamically populated -->
+            </select>
+
+            <div id="recurrence-ref-card" class="mt-4 p-4 bg-white rounded-lg border border-slate-200 text-xs space-y-2">
+              <p class="text-slate-500">Select an episode above to view baseline recorded symptoms.</p>
             </div>
+          </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 border-b">
-                            <tr>
-                                <th class="px-6 py-3">Episode ID</th>
-                                <th class="px-6 py-3">Patient</th>
-                                <th class="px-6 py-3">Illness</th>
-                                <th class="px-6 py-3">Date</th>
-                                <th class="px-6 py-3">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="records-table-body" class="divide-y divide-slate-100">
-                            <!-- Dynamically populated table rows -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Enter Patient's Current Symptoms (Comma separated)</label>
+            <textarea id="recurrence-current-input" rows="4" placeholder="e.g. Wheezing, Dry Cough, High Fever, Fatigue" class="w-full text-sm px-3 py-2 border rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+            <button onclick="runRecurrenceEngine()" class="mt-3 w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg text-sm shadow-sm flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-bolt"></i>
+              <span>Compute Symptom Overlap & Analysis</span>
+            </button>
+          </div>
+        </div>
 
-    </main>
+        <!-- Analysis Result Box -->
+        <div id="recurrence-result-box" class="hidden rounded-xl p-5 border">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-auto">
-        <p><strong>MediMemory System</strong> – Multi-Page Single File Web Application</p>
-        <p class="mt-1">Built with HTML5, Tailwind CSS, JavaScript & Browser LocalStorage</p>
-    </footer>
+      <!-- DOCTOR TAB CONTENT 4: PRECAUTIONS & EMERGENCY MANAGER -->
+      <div id="doc-panel-precautions" class="hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-kit-medical text-sky-600"></i>
+            <span>Emergency Guidelines & First-Aid Instructions</span>
+          </h3>
+          <p class="text-xs text-slate-500">Summary of all emergency precautions and first-aid measures configured for patient self-care.</p>
+        </div>
 
-    <!-- JAVASCRIPT LOGIC & ENGINE -->
-    <script>
-        // SAMPLE INITIAL DEMO DATA
-        const initialEpisodes = [
-            {
-                id: 'EP-9012',
-                patientId: 'PT-1004',
-                patientName: 'Rahul Sharma',
-                illness: 'Acute Gastritis & Acidity',
-                date: '2024-03-15',
-                symptoms: ['Upper abdominal pain', 'Nausea', 'Heartburn', 'Bloating'],
-                preDiag: 'Patient reported burning chest sensation and sharp pain after meals.',
-                postDiag: 'Confirmed Acute Gastritis secondary to irregular meal habits.',
-                treatment: 'Pantoprazole 40mg before breakfast (14 days), Antacid syrup post meals.',
-                precautions: 'Avoid spicy/greasy food. Avoid late-night meals. Stay hydrated.'
-            },
-            {
-                id: 'EP-9844',
-                patientId: 'PT-1004',
-                patientName: 'Rahul Sharma',
-                illness: 'Recurrent Epigastric Pain',
-                date: '2026-10-10',
-                symptoms: ['Upper abdominal pain', 'Heartburn', 'Loss of appetite'],
-                preDiag: 'Recurring irritation following intense work stress.',
-                postDiag: 'Gastroesophageal Reflux Flare-up.',
-                treatment: 'Rabeprazole 20mg, Probiotics.',
-                precautions: 'Do not lie down immediately after eating. Keep head elevated.'
-            }
-        ];
+        <div id="doc-precautions-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
 
-        // LOCALSTORAGE HELPERS
-        function getEpisodes() {
-            const data = localStorage.getItem('medimemory_db');
-            if (!data) {
-                localStorage.setItem('medimemory_db', JSON.stringify(initialEpisodes));
-                return initialEpisodes;
-            }
-            return JSON.parse(data);
-        }
+      <!-- DOCTOR TAB CONTENT 5: RECORDS DATABASE -->
+      <div id="doc-panel-database" class="hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+              <i class="fa-solid fa-database text-sky-600"></i>
+              <span>Master Records Database</span>
+            </h3>
+            <p class="text-xs text-slate-500">Full searchable ledger of clinical entries with quick edit and deletion capabilities.</p>
+          </div>
+          <div class="w-full md:w-72">
+            <input type="text" id="db-search-input" onkeyup="renderDatabaseTable()" placeholder="Search patient, diagnosis, or symptom..." class="w-full text-xs px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          </div>
+        </div>
 
-        function saveEpisodes(data) {
-            localStorage.setItem('medimemory_db', JSON.stringify(data));
-            updateDashboardStats();
-            renderTimeline();
-            populateComparisonDropdown();
-            renderGuidancePage();
-            renderRecordsTable();
-        }
-
-        // SPA ROUTER / NAVIGATION
-        function navigateTo(pageId) {
-            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(el => {
-                el.classList.remove('text-medical-600', 'bg-medical-50');
-                el.classList.add('text-slate-600');
-            });
-
-            const activePage = document.getElementById('page-' + pageId);
-            if (activePage) activePage.classList.add('active');
-
-            const activeNav = document.getElementById('nav-' + pageId);
-            if (activeNav) {
-                activeNav.classList.remove('text-slate-600');
-                activeNav.classList.add('text-medical-600', 'bg-medical-50');
-            }
-
-            document.getElementById('mobile-menu').classList.add('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function toggleMobileMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
-
-        // PAGE 1: DASHBOARD STATS
-        function updateDashboardStats() {
-            const episodes = getEpisodes();
-            document.getElementById('stat-total-episodes').textContent = episodes.length;
-            const uniquePatients = new Set(episodes.map(e => e.patientId));
-            document.getElementById('stat-total-patients').textContent = uniquePatients.size;
-        }
-
-        // PAGE 2: SAVE NEW EPISODE
-        function handleSaveEpisode(e) {
-            e.preventDefault();
-            const episodes = getEpisodes();
-            const symptomsArr = document.getElementById('doc-symptoms').value
-                .split(',')
-                .map(s => s.trim())
-                .filter(s => s.length > 0);
-
-            const newEp = {
-                id: 'EP-' + Math.floor(1000 + Math.random() * 9000),
-                patientId: document.getElementById('doc-patient-id').value.trim(),
-                patientName: document.getElementById('doc-patient-name').value.trim(),
-                illness: document.getElementById('doc-illness').value.trim(),
-                date: document.getElementById('doc-date').value,
-                symptoms: symptomsArr,
-                preDiag: document.getElementById('doc-prediag').value.trim() || 'N/A',
-                postDiag: document.getElementById('doc-postdiag').value.trim() || 'N/A',
-                treatment: document.getElementById('doc-treatment').value.trim() || 'None prescribed',
-                precautions: document.getElementById('doc-precautions').value.trim() || 'General rest.'
-            };
-
-            episodes.unshift(newEp);
-            saveEpisodes(episodes);
-            alert(`Medical Episode '${newEp.illness}' successfully recorded!`);
-            document.getElementById('episode-form').reset();
-            navigateTo('timeline');
-        }
-
-        // PAGE 3: RENDER TIMELINE
-        function renderTimeline() {
-            const targetId = document.getElementById('search-patient-id').value.trim().toUpperCase();
-            const episodes = getEpisodes().filter(e => e.patientId.toUpperCase() === targetId);
-            const container = document.getElementById('timeline-container');
-            container.innerHTML = '';
-
-            if (episodes.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-slate-500 text-sm">No recorded episodes found for Patient ID: <strong>${targetId}</strong>. Try searching for demo ID <strong>PT-1004</strong>.</div>`;
-                return;
-            }
-
-            episodes.forEach(ep => {
-                const card = document.createElement('div');
-                card.className = "relative bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4";
-                card.innerHTML = `
-                    <div class="absolute -left-[35px] top-6 w-6 h-6 rounded-full bg-medical-600 border-4 border-slate-50 text-white flex items-center justify-center text-[10px]">
-                        <i class="fa-solid fa-circle"></i>
-                    </div>
-                    <div class="flex flex-col sm:flex-row justify-between border-b pb-3">
-                        <div>
-                            <span class="text-xs font-bold text-medical-600 uppercase">${ep.date}</span>
-                            <h4 class="text-xl font-bold text-slate-900">${ep.illness}</h4>
-                            <span class="text-xs text-slate-500 font-medium">${ep.patientName} (${ep.patientId})</span>
-                        </div>
-                        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full w-fit font-mono font-medium h-fit">${ep.id}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Symptoms:</span>
-                        <div class="flex flex-wrap gap-1.5">
-                            ${ep.symptoms.map(s => `<span class="bg-sky-50 text-medical-700 text-xs px-2.5 py-1 rounded-lg border border-sky-100 font-medium">${s}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs">
-                        <strong class="text-slate-700 block mb-1">Confirmed Diagnosis:</strong>
-                        <p class="text-slate-600">${ep.postDiag}</p>
-                    </div>
-                    <div class="bg-emerald-50 p-3.5 rounded-xl border border-emerald-100 text-xs">
-                        <strong class="text-emerald-900 block mb-1"><i class="fa-solid fa-pills mr-1"></i> Prescribed Treatment:</strong>
-                        <p class="text-emerald-800 font-medium">${ep.treatment}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // PAGE 4: RECURRENCE COMPARISON
-        function populateComparisonDropdown() {
-            const select = document.getElementById('compare-episode-select');
-            select.innerHTML = '<option value="">-- Choose Past Episode --</option>';
-            const episodes = getEpisodes();
-            episodes.forEach(ep => {
-                const opt = document.createElement('option');
-                opt.value = ep.id;
-                opt.textContent = `${ep.date} - ${ep.patientName} (${ep.illness})`;
-                select.appendChild(opt);
-            });
-        }
-
-        function runComparison() {
-            const selectId = document.getElementById('compare-episode-select').value;
-            const currentSymText = document.getElementById('compare-current-symptoms').value.trim();
-
-            if (!selectId || !currentSymText) {
-                alert('Please select a past episode and enter current symptoms.');
-                return;
-            }
-
-            const episodes = getEpisodes();
-            const pastEp = episodes.find(e => e.id === selectId);
-            if (!pastEp) return;
-
-            const currentArr = currentSymText.split(',').map(s => s.trim().toLowerCase());
-            const pastArr = pastEp.symptoms.map(s => s.trim().toLowerCase());
-
-            const matches = [];
-            const diffs = [];
-
-            currentArr.forEach(sym => {
-                if (pastArr.some(p => p.includes(sym) || sym.includes(p))) {
-                    matches.push(sym);
-                } else {
-                    diffs.push(sym);
-                }
-            });
-
-            document.getElementById('comparison-result').classList.remove('hidden');
-            document.getElementById('comp-date-badge').textContent = `Compared with ${pastEp.date} (${pastEp.illness})`;
-
-            document.getElementById('comp-matches').textContent = matches.length > 0 
-                ? matches.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(', ') 
-                : 'No recurring symptom matches found.';
-
-            document.getElementById('comp-differences').textContent = diffs.length > 0 
-                ? diffs.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ') 
-                : 'All current symptoms match past episode records.';
-        }
-
-        // PAGE 5: GUIDANCE
-        function renderGuidancePage() {
-            const episodes = getEpisodes();
-            const container = document.getElementById('guidance-list');
-            container.innerHTML = '';
-
-            episodes.forEach(ep => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <h4 class="font-bold text-slate-900">${ep.illness}</h4>
-                        <span class="text-xs bg-sky-100 text-sky-700 px-2.5 py-1 rounded-full font-semibold">${ep.date}</span>
-                    </div>
-                    <p class="text-xs text-slate-500">Patient: <strong>${ep.patientName}</strong> (${ep.patientId})</p>
-                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
-                        <strong class="block text-amber-900 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Doctor Precautions:</strong>
-                        <p>${ep.precautions}</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // PAGE 6: RECORDS TABLE MANAGER
-        function renderRecordsTable() {
-            const episodes = getEpisodes();
-            const tbody = document.getElementById('records-table-body');
-            tbody.innerHTML = '';
-
-            episodes.forEach(ep => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50";
-                tr.innerHTML = `
-                    <td class="px-6 py-4 font-mono text-xs font-bold text-slate-700">${ep.id}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-900">${ep.patientName} <span class="text-xs text-slate-400 block">${ep.patientId}</span></td>
-                    <td class="px-6 py-4">${ep.illness}</td>
-                    <td class="px-6 py-4 text-xs text-slate-500">${ep.date}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="deleteRecord('${ep.id}')" class="text-rose-600 hover:text-rose-800 font-bold text-xs">
-                            <i class="fa-solid fa-trash mr-1"></i> Delete
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function deleteRecord(id) {
-            if (confirm(`Are you sure you want to delete episode record ${id}?`)) {
-                let episodes = getEpisodes();
-                episodes = episodes.filter(e => e.id !== id);
-                saveEpisodes(episodes);
-            }
-        }
-
-        function exportDatabaseJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getEpisodes(), null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "medimemory_records.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function resetDemoData() {
-            localStorage.setItem('medimemory_db', JSON.stringify(initialEpisodes));
-            saveEpisodes(initialEpisodes);
-            alert('Database reset to initial demo state.');
-        }
-
-        // INITIAL ONLOAD SETUP
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('doc-date').value = today;
-
-            updateDashboardStats();
-            renderTimeline();
-            populateComparisonDropdown();
-            renderGuidancePage();
-            renderRecordsTable();
-        });
-    </script>
-</body>
-</html>
-
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 text-xs uppercase font-semibold">
+                <th class="p-3 rounded-l-
